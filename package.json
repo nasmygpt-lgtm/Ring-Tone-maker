@@ -1,0 +1,11 @@
+{
+  "name": "ringtone-maker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser-based MP3 cutter for making phone ringtones. 100% client-side.",
+  "scripts": {
+    "start": "node serve.js",
+    "dev": "node serve.js 3000"
+  }
+}

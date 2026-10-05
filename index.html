@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1020" />
+
+    <!-- SEO: these are the defaults; each route overrides them at runtime via src/lib/seo.js -->
+    <title>Ringtone Maker — Cut MP3 Ringtones in Your Browser</title>
+    <meta name="description" content="Free browser-based MP3 cutter for phone ringtones. Upload audio, auto-split or cut by hand on a waveform, add fades, and download 320 kbps MP3s. 100% local — nothing is uploaded." />
+    <link rel="canonical" href="/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Ringtone Maker" />
+    <meta property="og:title" content="Ringtone Maker — Cut MP3 Ringtones in Your Browser" />
+    <meta property="og:description" content="Free browser-based MP3 cutter for phone ringtones. 100% local — nothing is uploaded." />
+    <meta property="og:image" content="/og.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ringtone Maker — Cut MP3 Ringtones in Your Browser" />
+    <meta name="twitter:description" content="Free browser-based MP3 cutter for phone ringtones. 100% local — nothing is uploaded." />
+    <meta name="twitter:image" content="/og.svg" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <link rel="stylesheet" href="/src/styles/app.css" />
+
+    <!--
+      No build step. Runtime dependencies are resolved by the browser via this import map.
+      (The build sandbox cannot reach the npm registry, so libraries load from a CDN in the
+      user's browser instead. All audio processing still happens 100% locally.)
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@19.1.0",
+          "react-dom": "https://esm.sh/react-dom@19.1.0",
+          "react-dom/client": "https://esm.sh/react-dom@19.1.0/client",
+          "htm/react": "https://esm.sh/htm@3.1.1/react?external=react",
+          "wavesurfer": "https://esm.sh/wavesurfer.js@7",
+          "wavesurfer/regions": "https://esm.sh/wavesurfer.js@7/dist/plugins/regions.esm.js",
+          "lamejs": "https://esm.sh/@breezystack/lamejs@1.2.7",
+          "jszip": "https://esm.sh/jszip@3.10.1"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <noscript>Ringtone Maker needs JavaScript enabled to run in your browser.</noscript>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

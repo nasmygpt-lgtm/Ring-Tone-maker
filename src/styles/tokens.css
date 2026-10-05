@@ -1,0 +1,107 @@
+/*
+  Midnight Music — semantic design tokens.
+  Components never hardcode colors; they reference these variables.
+*/
+:root {
+  /* --- raw palette (private, referenced only by semantic tokens below) --- */
+  --navy-950: #070a16;
+  --navy-900: #0b1020;
+  --navy-850: #0f1527;
+  --navy-800: #141b32;
+  --navy-700: #1b2440;
+  --navy-600: #26314f;
+  --navy-500: #38456b;
+
+  --violet-600: #6d4bff;
+  --violet-500: #8b5cf6;
+  --violet-400: #a78bfa;
+  --violet-300: #c4b5fd;
+
+  --cyan-500: #22d3ee;
+  --cyan-400: #38e0f0;
+  --cyan-300: #67e8f9;
+
+  --rose-500: #fb5a7d;
+  --amber-400: #fbbf24;
+  --green-400: #34d399;
+
+  --white: #ffffff;
+  --slate-100: #e8ecf6;
+  --slate-300: #b4bdd6;
+  --slate-400: #8b95b5;
+  --slate-500: #6b7599;
+
+  /* --- semantic surface tokens --- */
+  --bg-app: radial-gradient(1200px 800px at 20% -10%, #15193a 0%, var(--navy-900) 42%, var(--navy-950) 100%);
+  --bg-surface: var(--navy-850);
+  --bg-surface-raised: var(--navy-800);
+  --bg-surface-sunken: var(--navy-900);
+  --bg-input: var(--navy-800);
+  --bg-hover: var(--navy-700);
+
+  /* --- borders --- */
+  --border-subtle: rgba(167, 139, 250, 0.12);
+  --border-default: rgba(167, 139, 250, 0.2);
+  --border-strong: rgba(167, 139, 250, 0.4);
+
+  /* --- text --- */
+  --text-primary: var(--slate-100);
+  --text-secondary: var(--slate-300);
+  --text-muted: var(--slate-400);
+  --text-on-accent: var(--white);
+
+  /* --- accents --- */
+  --accent-primary: var(--violet-500);
+  --accent-primary-strong: var(--violet-600);
+  --accent-primary-soft: rgba(139, 92, 246, 0.16);
+  --accent-secondary: var(--cyan-500);
+  --accent-secondary-strong: var(--cyan-400);
+  --accent-secondary-soft: rgba(34, 211, 238, 0.14);
+
+  /* --- status --- */
+  --danger: var(--rose-500);
+  --danger-soft: rgba(251, 90, 125, 0.14);
+  --warning: var(--amber-400);
+  --success: var(--green-400);
+
+  /* --- gradients / effects --- */
+  --gradient-brand: linear-gradient(100deg, var(--violet-500), var(--cyan-500));
+  --gradient-brand-soft: linear-gradient(100deg, rgba(139,92,246,0.18), rgba(34,211,238,0.14));
+  --glow-primary: 0 0 0 1px var(--border-default), 0 8px 30px rgba(109, 75, 255, 0.28);
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.03) inset, 0 10px 30px rgba(3, 6, 18, 0.5);
+
+  /* --- waveform (consumed by wavesurfer config) --- */
+  --wave-color: #4b5680;
+  --wave-progress: var(--violet-400);
+  --wave-cursor: var(--cyan-400);
+
+  /* --- geometry --- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* --- spacing scale --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+
+  /* --- typography --- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  /* --- layout --- */
+  --topbar-h: 60px;
+  --content-max: 1040px;
+
+  /* region colors cycle for manual/auto segments */
+  --region-1: rgba(139, 92, 246, 0.28);
+  --region-2: rgba(34, 211, 238, 0.26);
+  --region-3: rgba(251, 191, 36, 0.26);
+  --region-4: rgba(52, 211, 153, 0.26);
+  --region-5: rgba(251, 90, 125, 0.26);
+}
