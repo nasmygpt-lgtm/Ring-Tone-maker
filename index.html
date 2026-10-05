@@ -5,24 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0b1020" />
 
+    <!--
+      Base href makes every relative asset + client route resolve correctly whether the app is
+      served from the domain root ("/") or a subpath (e.g. GitHub Pages "/Ring-Tone-maker/").
+      It is rewritten at load time to the directory this index.html is served from.
+    -->
+    <script>
+      (function () {
+        var p = location.pathname;
+        // directory of the current document (strip a trailing file name if any)
+        var dir = p.replace(/[^/]*$/, "");
+        var b = document.createElement("base");
+        b.href = dir;
+        document.head.appendChild(b);
+        // expose for the router
+        window.__BASE_PATH__ = dir;
+      })();
+    </script>
+
     <!-- SEO: these are the defaults; each route overrides them at runtime via src/lib/seo.js -->
     <title>Ringtone Maker — Cut MP3 Ringtones in Your Browser</title>
     <meta name="description" content="Free browser-based MP3 cutter for phone ringtones. Upload audio, auto-split or cut by hand on a waveform, add fades, and download 320 kbps MP3s. 100% local — nothing is uploaded." />
-    <link rel="canonical" href="/" />
+    <link rel="canonical" href="./" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Ringtone Maker" />
     <meta property="og:title" content="Ringtone Maker — Cut MP3 Ringtones in Your Browser" />
     <meta property="og:description" content="Free browser-based MP3 cutter for phone ringtones. 100% local — nothing is uploaded." />
-    <meta property="og:image" content="/og.svg" />
+    <meta property="og:image" content="og.svg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Ringtone Maker — Cut MP3 Ringtones in Your Browser" />
     <meta name="twitter:description" content="Free browser-based MP3 cutter for phone ringtones. 100% local — nothing is uploaded." />
-    <meta name="twitter:image" content="/og.svg" />
+    <meta name="twitter:image" content="og.svg" />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/src/styles/tokens.css" />
-    <link rel="stylesheet" href="/src/styles/app.css" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="src/styles/tokens.css" />
+    <link rel="stylesheet" href="src/styles/app.css" />
 
     <!--
       No build step. Runtime dependencies are resolved by the browser via this import map.
@@ -48,6 +66,6 @@
     <div id="root">
       <noscript>Ringtone Maker needs JavaScript enabled to run in your browser.</noscript>
     </div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="src/main.js"></script>
   </body>
 </html>

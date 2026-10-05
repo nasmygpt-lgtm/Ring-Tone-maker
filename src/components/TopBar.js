@@ -1,6 +1,6 @@
 import htm from "htm/react";
 import React from "react";
-import { useRoute, navigate } from "../lib/router.js";
+import { useRoute, navigate, href } from "../lib/router.js";
 import { IconScissors, IconPhone, IconSettings, IconMusic } from "./icons.js";
 
 const html = htm.bind(React.createElement);
@@ -21,7 +21,7 @@ export function TopBar() {
   return html`
     <header class="topbar">
       <div class="container">
-        <a class="brand" href="/" onClick=${(e) => go(e, "/")} aria-label="Ringtone Maker home">
+        <a class="brand" href=${href("/")} onClick=${(e) => go(e, "/")} aria-label="Ringtone Maker home">
           <span class="logo">${IconMusic({ "aria-hidden": "true" })}</span>
           <span class="brand-text">Ringtone Maker</span>
         </a>
@@ -31,7 +31,7 @@ export function TopBar() {
               <a
                 key=${to}
                 class="nav-link"
-                href=${to}
+                href=${href(to)}
                 data-active=${String(path === to)}
                 aria-current=${path === to ? "page" : undefined}
                 title=${label}

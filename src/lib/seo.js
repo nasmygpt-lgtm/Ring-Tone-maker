@@ -21,12 +21,20 @@ function upsertLink(rel, href) {
   el.setAttribute("href", href);
 }
 
-export function applySeo({ title, description, path = "/", image = "/og.svg" }) {
+export function applySeo({ title, description, path = "/", image = "og.svg" }) {
   const fullTitle = title.includes(SITE) ? title : `${title} — ${SITE}`;
   document.title = fullTitle;
 
+  // Resolve absolute URLs against the current base so canonical/OG work on any host (root or subpath).
+  const base = (window.__BASE_PATH__ || "/").replace(/\/+$/, "/");
+  const origin = window.location.origin;
+  const canonical = origin + base + "#" + (path.startsWith("/") ? path : "/" + path);
+  const imageUrl = /^https?:/.test(image) ? image : origin + base + image.replace(/^\//, "");
+
   upsertMeta('meta[name="description"]', "name", "description", description);
-  upsertLink("canonical", path);
+  upsertLink("canonical", canonical);
+  path = canonical; // used for og:url below
+  image = imageUrl;
 
   upsertMeta('meta[property="og:title"]', "property", "og:title", fullTitle);
   upsertMeta('meta[property="og:description"]', "property", "og:description", description);

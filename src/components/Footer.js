@@ -1,6 +1,6 @@
 import htm from "htm/react";
 import React from "react";
-import { navigate } from "../lib/router.js";
+import { navigate, href } from "../lib/router.js";
 import { IconShield } from "./icons.js";
 
 const html = htm.bind(React.createElement);
@@ -15,9 +15,9 @@ export function Footer() {
           100% local — your audio never leaves this device.
         </span>
         <span class="row" style=${{ gap: "14px" }}>
-          <a href="/" onClick=${(e) => go(e, "/")}>Cutter</a>
-          <a href="/preview" onClick=${(e) => go(e, "/preview")}>Preview</a>
-          <a href="/setup" onClick=${(e) => go(e, "/setup")}>Set up</a>
+          <a href=${href("/")} onClick=${(e) => go(e, "/")}>Cutter</a>
+          <a href=${href("/preview")} onClick=${(e) => go(e, "/preview")}>Preview</a>
+          <a href=${href("/setup")} onClick=${(e) => go(e, "/setup")}>Set up</a>
         </span>
       </div>
     </footer>
