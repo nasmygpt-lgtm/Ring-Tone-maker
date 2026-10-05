@@ -56,26 +56,68 @@ export function PreviewPage() {
     loadBlob(f, f.name);
   }
 
-  // Set up WebAudio graph (for gain boost) once we have an <audio> element.
-  function ensureGraph() {
-    if (!audioRef.current) return;
+  // The Web Audio graph is built ONLY when the gain boost is enabled. For normal
+  // playback we drive the plain <audio> element's .volume, which is always audible.
+  // (Calling createMediaElementSource reroutes the element exclusively through the
+  // graph — a common cause of silent playback — so we avoid it unless boost is on.)
+  async function ensureGraph() {
+    const a = audioRef.current;
+    if (!a) return false;
     if (!ctxRef.current) {
-      ctxRef.current = getAudioContext();
-      srcNodeRef.current = ctxRef.current.createMediaElementSource(audioRef.current);
-      gainRef.current = ctxRef.current.createGain();
-      srcNodeRef.current.connect(gainRef.current).connect(ctxRef.current.destination);
+      try {
+        ctxRef.current = getAudioContext();
+        srcNodeRef.current = ctxRef.current.createMediaElementSource(a);
+        gainRef.current = ctxRef.current.createGain();
+        srcNodeRef.current.connect(gainRef.current).connect(ctxRef.current.destination);
+      } catch (e) {
+        // if the graph can't be built, fall back to element volume
+        ctxRef.current = null; gainRef.current = null; srcNodeRef.current = null;
+        return false;
+      }
+    }
+    if (ctxRef.current.state === "suspended") await ctxRef.current.resume();
+    return true;
+  }
+
+  // Apply current volume/boost to whichever output path is active.
+  function applyVolume() {
+    const a = audioRef.current;
+    if (gainRef.current) {
+      gainRef.current.gain.value = volume * (boost ? 2.5 : 1);
+      if (a) a.volume = 1; // element at unity; gain node controls level
+    } else if (a) {
+      a.volume = Math.min(1, volume);
     }
   }
 
-  // Apply volume + boost to the graph / element.
+  // React to volume/boost changes.
   React.useEffect(() => {
-    if (gainRef.current) {
-      // boost multiplies up to 2.5x on top of the slider
-      gainRef.current.gain.value = volume * (boost ? 2.5 : 1);
-    } else if (audioRef.current) {
-      audioRef.current.volume = Math.min(1, volume);
-    }
+    let cancelled = false;
+    (async () => {
+      if (boost) {
+        const ok = await ensureGraph(); // lazily build the graph the first time boost is on
+        if (cancelled) return;
+        if (!ok) { // graph unavailable -> clamp to element volume
+          if (audioRef.current) audioRef.current.volume = Math.min(1, volume);
+          return;
+        }
+      }
+      applyVolume();
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line
   }, [volume, boost]);
+
+  // Point the <audio> element at the current blob URL and (re)apply volume.
+  React.useEffect(() => {
+    const a = audioRef.current;
+    if (!a || !url) return;
+    a.src = url;
+    a.load();
+    setPlaying(false);
+    applyVolume();
+    // eslint-disable-next-line
+  }, [url]);
 
   React.useEffect(() => {
     if (audioRef.current) audioRef.current.loop = loop;
@@ -84,12 +126,16 @@ export function PreviewPage() {
   async function togglePlay() {
     const a = audioRef.current;
     if (!a) return;
-    ensureGraph();
-    if (ctxRef.current && ctxRef.current.state === "suspended") await ctxRef.current.resume();
-    if (gainRef.current) gainRef.current.gain.value = volume * (boost ? 2.5 : 1);
-    else a.volume = Math.min(1, volume);
-    if (a.paused) { await a.play(); setPlaying(true); }
-    else { a.pause(); setPlaying(false); }
+    if (boost) await ensureGraph();        // only engage Web Audio when boosting
+    else if (ctxRef.current && ctxRef.current.state === "suspended") await ctxRef.current.resume();
+    applyVolume();
+    if (a.paused) {
+      try { await a.play(); setPlaying(true); }
+      catch (e) { setPlaying(false); }
+    } else {
+      a.pause();
+      setPlaying(false);
+    }
   }
 
   function download() {
@@ -164,7 +210,7 @@ export function PreviewPage() {
                     style=${{ display: "none" }} onChange=${(e) => handleFiles(e.target.files)} />
                 </div>
 
-                <audio ref=${audioRef} src=${url} crossorigin="anonymous"
+                <audio ref=${audioRef}
                   onEnded=${() => !loop && setPlaying(false)} style=${{ display: "none" }}></audio>
 
                 <div class="row" style=${{ gap: "10px", marginBottom: "18px" }}>
