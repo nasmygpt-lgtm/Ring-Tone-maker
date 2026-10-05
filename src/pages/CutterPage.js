@@ -205,8 +205,12 @@ export function CutterPage() {
     setSegments((prev) => prev.filter((s) => s.id !== id));
   }
 
-  function previewSegment(seg) {
-    if (waveApi.current) waveApi.current.toggleRegion(seg.start, seg.end, seg.id);
+  function playSegment(seg) {
+    if (waveApi.current) waveApi.current.playRegion(seg.start, seg.end, seg.id);
+  }
+
+  function pausePreview() {
+    if (waveApi.current) waveApi.current.pause();
   }
 
   async function buildBlob(seg) {
@@ -443,10 +447,14 @@ export function CutterPage() {
                           </label>
                           <span class="grow"></span>
                           <button class=${"btn btn-sm " + (playingSegId === seg.id ? "btn-secondary" : "btn-ghost")}
-                            onClick=${() => previewSegment(seg)}
-                            aria-label=${playingSegId === seg.id ? "Pause preview" : "Preview segment"}>
-                            ${playingSegId === seg.id ? IconPause({}) : IconPlay({})}
-                            <span>${playingSegId === seg.id ? "Pause" : "Preview"}</span>
+                            onClick=${() => playSegment(seg)}
+                            aria-label="Preview segment">
+                            ${IconPlay({})}<span>Preview</span>
+                          </button>
+                          <button class="btn btn-ghost btn-sm" onClick=${pausePreview}
+                            disabled=${playingSegId !== seg.id}
+                            aria-label="Pause preview">
+                            ${IconPause({})}<span>Pause</span>
                           </button>
                           <button class="btn btn-ghost btn-sm" onClick=${() => sendToPreview(seg)} title="Open in ringtone preview">${IconPhone({})}<span>Try as ringtone</span></button>
                           <button class="btn btn-primary btn-sm" onClick=${() => downloadOne(seg)} disabled=${!!progress}>${IconDownload({})}<span>MP3</span></button>
