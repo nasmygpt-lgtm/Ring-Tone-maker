@@ -1,4 +1,4 @@
-import htm from "htm/react";
+import htm from "htm";
 import React from "react";
 import { useToasts, dismissToast } from "../lib/store.js";
 import { IconCheck, IconAlert, IconInfo, IconX } from "./icons.js";

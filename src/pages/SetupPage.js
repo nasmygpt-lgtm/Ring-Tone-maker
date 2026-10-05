@@ -1,4 +1,4 @@
-import htm from "htm/react";
+import htm from "htm";
 import React from "react";
 import { applySeo } from "../lib/seo.js";
 import { IconAndroid, IconApple, IconInfo, IconScissors } from "../components/icons.js";

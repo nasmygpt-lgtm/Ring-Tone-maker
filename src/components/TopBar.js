@@ -1,4 +1,4 @@
-import htm from "htm/react";
+import htm from "htm";
 import React from "react";
 import { useRoute, navigate, href } from "../lib/router.js";
 import { IconScissors, IconPhone, IconSettings, IconMusic } from "./icons.js";

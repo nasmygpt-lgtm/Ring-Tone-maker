@@ -1,4 +1,4 @@
-import htm from "htm/react";
+import htm from "htm";
 import React from "react";
 import WaveSurfer from "wavesurfer";
 import RegionsPlugin from "wavesurfer/regions";

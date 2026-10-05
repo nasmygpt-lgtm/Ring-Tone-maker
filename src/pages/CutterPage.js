@@ -1,4 +1,4 @@
-import htm from "htm/react";
+import htm from "htm";
 import React from "react";
 import JSZip from "jszip";
 import { Waveform } from "../components/Waveform.js";

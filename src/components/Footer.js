@@ -1,4 +1,4 @@
-import htm from "htm/react";
+import htm from "htm";
 import React from "react";
 import { navigate, href } from "../lib/router.js";
 import { IconShield } from "./icons.js";

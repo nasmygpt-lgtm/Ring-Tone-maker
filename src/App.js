@@ -1,4 +1,4 @@
-import htm from "htm/react";
+import htm from "htm";
 import React from "react";
 import { useRoute } from "./lib/router.js";
 import { TopBar } from "./components/TopBar.js";
