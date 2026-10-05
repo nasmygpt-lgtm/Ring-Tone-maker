@@ -21,19 +21,27 @@ function cssVar(name, fallback) {
  *   onReady         (durationSeconds) => void
  *   registerApi     (api) => void  — exposes { playRegion, stop } to parent
  */
-export function Waveform({ blobUrl, segments, onRegionUpdate, onReady, registerApi }) {
+export function Waveform({ blobUrl, segments, onRegionUpdate, onReady, registerApi, onPlayingSeg }) {
   const hostRef = React.useRef(null);
   const wsRef = React.useRef(null);
   const regionsRef = React.useRef(null);
   const regionMap = React.useRef(new Map()); // segId -> region
-  const [isPlaying, setPlaying] = React.useState(false);
+  const [isPlaying, setPlayingState] = React.useState(false);
+  const isPlayingRef = React.useRef(false);
+  const setPlaying = (v) => { isPlayingRef.current = v; setPlayingState(v); };
   const [cursor, setCursor] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
-  const playBoundRef = React.useRef(null); // {end} to stop region playback
+  const playBoundRef = React.useRef(null); // {end, segId} for region playback
+  const playingSegRef = React.useRef(null); // id of the segment currently previewing
 
   // keep latest callbacks without re-creating wavesurfer
   const cbRef = React.useRef({});
-  cbRef.current = { onRegionUpdate, onReady };
+  cbRef.current = { onRegionUpdate, onReady, onPlayingSeg };
+
+  function notifyPlayingSeg(id) {
+    playingSegRef.current = id;
+    cbRef.current.onPlayingSeg && cbRef.current.onPlayingSeg(id);
+  }
 
   // --- create wavesurfer once per blobUrl ---
   React.useEffect(() => {
@@ -68,11 +76,12 @@ export function Waveform({ blobUrl, segments, onRegionUpdate, onReady, registerA
       if (bound && t >= bound.end) {
         ws.pause();
         playBoundRef.current = null;
+        notifyPlayingSeg(null); // region preview reached its end
       }
     });
     ws.on("play", () => setPlaying(true));
-    ws.on("pause", () => setPlaying(false));
-    ws.on("finish", () => setPlaying(false));
+    ws.on("pause", () => { setPlaying(false); notifyPlayingSeg(null); });
+    ws.on("finish", () => { setPlaying(false); notifyPlayingSeg(null); });
 
     // region drag/resize -> clamp to MAX and report up
     regions.on("region-updated", (region) => {
@@ -135,18 +144,38 @@ export function Waveform({ blobUrl, segments, onRegionUpdate, onReady, registerA
   // --- expose imperative API to parent (preview a region) ---
   React.useEffect(() => {
     if (!registerApi) return;
+    const playRegion = (start, end, segId) => {
+      const ws = wsRef.current;
+      if (!ws) return;
+      playBoundRef.current = { end, segId: segId || null };
+      ws.setTime(start);
+      ws.play();
+      notifyPlayingSeg(segId || null);
+    };
     registerApi({
-      playRegion: (start, end) => {
+      playRegion,
+      // Toggle a specific segment's preview: play it, or pause if it's already the one playing.
+      toggleRegion: (start, end, segId) => {
         const ws = wsRef.current;
         if (!ws) return;
-        playBoundRef.current = { end };
-        ws.setTime(start);
-        ws.play();
+        const isThisPlaying = playingSegRef.current === segId && isPlayingRef.current;
+        if (isThisPlaying) {
+          ws.pause();
+          notifyPlayingSeg(null);
+        } else {
+          playRegion(start, end, segId);
+        }
+      },
+      pause: () => {
+        const ws = wsRef.current;
+        if (ws && isPlayingRef.current) ws.pause();
+        notifyPlayingSeg(null);
       },
       stop: () => {
         const ws = wsRef.current;
         if (ws) { ws.pause(); ws.setTime(0); }
         playBoundRef.current = null;
+        notifyPlayingSeg(null);
       },
     });
   }, [registerApi, duration]);
