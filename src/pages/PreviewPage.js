@@ -5,7 +5,7 @@ import { consumeSharedRingtone } from "../lib/store.js";
 import { getAudioContext, triggerDownload } from "../lib/audio.js";
 import { navigate } from "../lib/router.js";
 import {
-  IconUpload, IconPlay, IconPause, IconLoop, IconVolume, IconDownload,
+  IconUpload, IconPlay, IconPause, IconStop, IconLoop, IconVolume, IconDownload,
   IconPhone, IconUser, IconX, IconScissors,
 } from "../components/icons.js";
 
@@ -138,6 +138,25 @@ export function PreviewPage() {
     }
   }
 
+  async function play() {
+    const a = audioRef.current;
+    if (!a || !a.paused) return;
+    if (boost) await ensureGraph();
+    else if (ctxRef.current && ctxRef.current.state === "suspended") await ctxRef.current.resume();
+    applyVolume();
+    try { await a.play(); setPlaying(true); } catch (e) { setPlaying(false); }
+  }
+
+  function pause() {
+    const a = audioRef.current;
+    if (a && !a.paused) { a.pause(); setPlaying(false); }
+  }
+
+  function stop() {
+    const a = audioRef.current;
+    if (a) { a.pause(); a.currentTime = 0; setPlaying(false); }
+  }
+
   function download() {
     if (blob) triggerDownload(blob, name || "ringtone.mp3");
   }
@@ -166,8 +185,7 @@ export function PreviewPage() {
                 <div class=${"avatar" + (playing ? " ringing" : "")}>${IconUser({})}</div>
                 <div class="call-actions">
                   <div>
-                    <button class="call-btn call-decline" aria-label="Stop"
-                      onClick=${() => { const a = audioRef.current; if (a) { a.pause(); a.currentTime = 0; setPlaying(false); } }}>
+                    <button class="call-btn call-decline" aria-label="Stop" onClick=${stop}>
                       ${IconX({})}
                     </button>
                     <div class="call-label">Decline</div>
@@ -214,12 +232,18 @@ export function PreviewPage() {
                   onEnded=${() => !loop && setPlaying(false)} style=${{ display: "none" }}></audio>
 
                 <div class="row" style=${{ gap: "10px", marginBottom: "18px" }}>
-                  <button class="btn btn-primary grow" onClick=${togglePlay}>
-                    ${playing ? IconPause({}) : IconPlay({})}<span>${playing ? "Pause" : "Play"}</span>
+                  <button class="btn btn-primary grow" onClick=${play} disabled=${playing} aria-label="Play">
+                    ${IconPlay({})}<span>Play</span>
                   </button>
-                  <button class=${"btn btn-sm " + (loop ? "btn-secondary" : "btn-ghost")}
-                    aria-pressed=${String(loop)} onClick=${() => setLoop((v) => !v)} title="Loop">
-                    ${IconLoop({})}<span>Loop</span>
+                  <button class="btn btn-ghost grow" onClick=${pause} disabled=${!playing} aria-label="Pause">
+                    ${IconPause({})}<span>Pause</span>
+                  </button>
+                  <button class="btn btn-ghost btn-icon" onClick=${stop} title="Stop" aria-label="Stop">
+                    ${IconStop({})}
+                  </button>
+                  <button class=${"btn btn-icon " + (loop ? "btn-secondary" : "btn-ghost")}
+                    aria-pressed=${String(loop)} onClick=${() => setLoop((v) => !v)} title=${loop ? "Loop: on" : "Loop: off"} aria-label="Toggle loop">
+                    ${IconLoop({})}
                   </button>
                 </div>
 
